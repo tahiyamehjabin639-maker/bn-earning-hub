@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0b6efd">
+  <title>BN Earning Hub</title>
+
+  <!-- Telegram Mini App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root{
+      --primary:#0b6efd;
+      --primary-dark:#0757c9;
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#172033;
+      --muted:#6d7890;
+      --border:#e7ebf2;
+      --success:#13a673;
+      --warning:#f59e0b;
+      --danger:#ef4444;
+      --shadow:0 10px 30px rgba(20,35,60,.08);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      min-height:100vh;
+      padding-bottom:88px;
+    }
+    button,a{font:inherit}
+    button{cursor:pointer}
+
+    .app{
+      max-width:620px;
+      margin:0 auto;
+      min-height:100vh;
+    }
+
+    .top{
+      padding:18px 16px 14px;
+      background:linear-gradient(135deg,#0b6efd,#063b92);
+      color:#fff;
+      border-radius:0 0 26px 26px;
+    }
+
+    .brand-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .logo{
+      width:48px;
+      height:48px;
+      border-radius:15px;
+      display:grid;
+      place-items:center;
+      background:rgba(255,255,255,.16);
+      font-size:25px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);
+    }
+
+    .brand h1{
+      margin:0;
+      font-size:20px;
+      line-height:1.15;
+    }
+
+    .brand p{
+      margin:4px 0 0;
+      font-size:12px;
+      opacity:.82;
+    }
+
+    .user-pill{
+      border:0;
+      background:rgba(255,255,255,.14);
+      color:#fff;
+      padding:9px 11px;
+      border-radius:999px;
+      font-size:12px;
+      max-width:150px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .balance{
+      margin-top:18px;
+      padding:18px;
+      border-radius:20px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.15);
+    }
+
+    .balance small{opacity:.78}
+    .balance strong{
+      display:block;
+      margin-top:5px;
+      font-size:31px;
+    }
+
+    .content{padding:16px}
+
+    .page{display:none}
+    .page.active{display:block}
+
+    .section-title{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin:6px 0 12px;
+    }
+
+    .section-title h2{
+      margin:0;
+      font-size:18px;
+    }
+
+    .section-title span{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+
+    .stat{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .icon{
+      width:42px;
+      height:42px;
+      border-radius:13px;
+      display:grid;
+      place-items:center;
+      background:#edf4ff;
+      font-size:21px;
+      flex:0 0 auto;
+    }
+
+    .stat strong{
+      display:block;
+      font-size:17px;
+    }
+
+    .stat span{
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:11px;
+    }
+
+    .hero{
+      margin-bottom:16px;
+      background:linear-gradient(135deg,#fff,#eef6ff);
+      border:1px solid #dfeafe;
+      border-radius:22px;
+      padding:20px;
+    }
+
+    .hero h2{
+      margin:0 0 8px;
+      font-size:23px;
+    }
+
+    .hero p{
+      margin:0 0 15px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .btn{
+      border:0;
+      border-radius:13px;
+      padding:12px 16px;
+      font-weight:700;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      min-height:44px;
+    }
+
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:active{background:var(--primary-dark)}
+    .btn-success{background:var(--success);color:#fff}
+    .btn-light{background:#eef3fa;color:var(--text)}
+    .btn-danger{background:#fff0f0;color:var(--danger)}
+
+    .full{width:100%}
+
+    .task{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:10px;
+    }
+
+    .task:last-child{margin-bottom:0}
+
+    .task-main{flex:1;min-width:0}
+    .task-main strong{
+      display:block;
+      font-size:14px;
+    }
+    .task-main small{
+      display:block;
+      margin-top:4px;
+      color:var(--muted);
+      line-height:1.4;
+    }
+
+    .reward{
+      white-space:nowrap;
+      color:var(--success);
+      font-weight:700;
+      font-size:12px;
+    }
+
+    .profile{
+      text-align:center;
+      padding:22px 16px;
+    }
+
+    .avatar{
+      width:76px;
+      height:76px;
+      margin:0 auto 12px;
+      border-radius:50%;
+      background:#e8f1ff;
+      display:grid;
+      place-items:center;
+      font-size:31px;
+      overflow:hidden;
+    }
+
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .profile h2{margin:0;font-size:20px}
+    .profile p{margin:6px 0 0;color:var(--muted);font-size:13px}
+
+    .refbox{
+      margin-top:16px;
+      background:#f8fafc;
+      border:1px dashed #cfd8e6;
+      border-radius:14px;
+      padding:12px;
+      text-align:left;
+    }
+
+    .refbox code{
+      display:block;
+      word-break:break-all;
+      color:#344054;
+      font-size:11px;
+      margin:7px 0 10px;
+    }
+
+    .notice{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:13px;
+      background:#fff8e8;
+      color:#7a5200;
+      font-size:12px;
+      line-height:1.5;
+    }
+
+    .empty{
+      padding:30px 15px;
+      text-align:center;
+      color:var(--muted);
+    }
+
+    .bottom-nav{
+      position:fixed;
+      z-index:20;
+      left:50%;
+      bottom:0;
+      transform:translateX(-50%);
+      width:min(620px,100%);
+      padding:9px 8px calc(9px + env(safe-area-inset-bottom));
+      background:rgba(255,255,255,.96);
+      backdrop-filter:blur(12px);
+      border-top:1px solid var(--border);
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+    }
+
+    .nav-btn{
+      border:0;
+      background:transparent;
+      color:#778198;
+      padding:7px 3px;
+      border-radius:12px;
+      font-size:10px;
+    }
+
+    .nav-btn .nav-icon{
+      display:block;
+      font-size:19px;
+      margin-bottom:3px;
+    }
+
+    .nav-btn.active{
+      color:var(--primary);
+      background:#eef5ff;
+      font-weight:700;
+    }
+
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      z-index:50;
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      background:rgba(0,0,0,.45);
+    }
+
+    .modal-backdrop.show{display:flex}
+
+    .modal{
+      width:min(620px,100%);
+      background:#fff;
+      border-radius:22px 22px 0 0;
+      padding:20px;
+      max-height:85vh;
+      overflow:auto;
+    }
+
+    .modal h3{margin:0 0 8px}
+    .modal p{color:var(--muted);font-size:13px;line-height:1.55}
+
+    @media (min-width:621px){
+      body{padding-bottom:20px}
+      .bottom-nav{position:sticky;transform:none;left:auto;margin:0 auto 10px;border:1px solid var(--border);border-radius:18px}
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <header class="top">
+      <div class="brand-row">
+        <div class="brand">
+          <div class="logo">BN</div>
+          <div>
+            <h1>BN Earning Hub</h1>
+            <p>Earn • Tasks • Rewards</p>
+          </div>
+        </div>
+        <button class="user-pill" id="userPill" onclick="openProfile()">Guest</button>
+      </div>
+
+      <div class="balance">
+        <small>Available Balance</small>
+        <strong id="balance">$0.00</strong>
+      </div>
+    </header>
+
+    <main class="content">
+
+      <!-- HOME -->
+      <section id="page-home" class="page active">
+        <div class="hero">
+          <h2>Welcome to BN Earning Hub 👋</h2>
+          <p>Complete available tasks, explore sponsored offers, and build your reward balance.</p>
+          <button class="btn btn-primary" onclick="showPage('earn')">🚀 Start Earning</button>
+        </div>
+
+        <div class="section-title">
+          <h2>Quick Stats</h2>
+          <span>Demo account</span>
+        </div>
+
+        <div class="grid">
+          <div class="card stat">
+            <div class="icon">💰</div>
+            <div><strong id="homeBalance">$0.00</strong><span>Balance</span></div>
+          </div>
+          <div class="card stat">
+            <div class="icon">🎯</div>
+            <div><strong id="completedCount">0</strong><span>Tasks completed</span></div>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:22px">
+          <h2>Featured Offer</h2>
+          <span>Sponsored</span>
+        </div>
+
+        <div class="card">
+          <div class="stat">
+            <div class="icon">🎁</div>
+            <div>
+              <strong>Explore Offers</strong>
+              <span>Open a sponsored offer to continue.</span>
+            </div>
+          </div>
+          <button class="btn btn-success full" style="margin-top:14px" onclick="openOffer()">
+            🎁 Explore Offer
+          </button>
+        </div>
+      </section>
+
+      <!-- EARN -->
+      <section id="page-earn" class="page">
+        <div class="section-title">
+          <h2>Earn Rewards</h2>
+          <span>Available tasks</span>
+        </div>
+
+        <div class="card">
+          <div class="task">
+            <div class="icon">🎁</div>
+            <div class="task-main">
+              <strong>Explore Sponsored Offer</strong>
+              <small>Open the offer page. Reward tracking should be connected to your backend before real payouts.</small>
+            </div>
+            <div class="reward">+$0.10</div>
+          </div>
+          <button class="btn btn-success full" onclick="openOffer()">
+            Open Offer
+          </button>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="task">
+            <div class="icon">📢</div>
+            <div class="task-main">
+              <strong>Join Community</strong>
+              <small>Connect your Telegram channel/group URL here.</small>
+            </div>
+            <div class="reward">+$0.05</div>
+          </div>
+          <button class="btn btn-light full" onclick="joinCommunity()">
+            Join Channel
+          </button>
+        </div>
+
+        <div class="notice">
+          Demo mode: the reward buttons update local demo balance only. Real earning, anti-fraud checks and withdrawals require a server/database.
+        </div>
+      </section>
+
+      <!-- REFERRAL -->
+      <section id="page-referral" class="page">
+        <div class="section-title">
+          <h2>Referral</h2>
+          <span>Invite friends</span>
+        </div>
+
+        <div class="card">
+          <div class="stat">
+            <div class="icon">👥</div>
+            <div>
+              <strong>Invite & Earn</strong>
+              <span>Share your referral link with friends.</span>
+            </div>
+          </div>
+
+          <div class="refbox">
+            <small>Your referral link</small>
+            <code id="refLink">https://t.me/BNEarningHubBot?start=ref_demo</code>
+            <button class="btn btn-primary full" onclick="copyReferral()">🔗 Copy Referral Link</button>
+          </div>
+
+          <div class="notice">
+            Referral attribution is only a front-end demo in this first version. To credit real referrals, store the Telegram user ID and referral code on a backend.
+          </div>
+        </div>
+      </section>
+
+      <!-- PROFILE -->
+      <section id="page-profile" class="page">
+        <div class="card profile">
+          <div class="avatar" id="avatar">👤</div>
+          <h2 id="profileName">Guest User</h2>
+          <p id="profileUsername">@guest</p>
+
+          <div class="grid" style="margin-top:18px;text-align:left">
+            <div class="card" style="box-shadow:none">
+              <small style="color:var(--muted)">User ID</small>
+              <strong id="profileId" style="display:block;margin-top:5px;font-size:13px">Not available</strong>
+            </div>
+            <div class="card" style="box-shadow:none">
+              <small style="color:var(--muted)">Language</small>
+              <strong id="profileLang" style="display:block;margin-top:5px;font-size:13px">en</strong>
+            </div>
+          </div>
+
+          <button class="btn btn-light full" style="margin-top:12px" onclick="closeMiniApp()">
+            Close App
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" data-page="home" onclick="showPage('home')">
+        <span class="nav-icon">🏠</span>Home
+      </button>
+      <button class="nav-btn" data-page="earn" onclick="showPage('earn')">
+        <span class="nav-icon">💰</span>Earn
+      </button>
+      <button class="nav-btn" data-page="referral" onclick="showPage('referral')">
+        <span class="nav-icon">👥</span>Referral
+      </button>
+      <button class="nav-btn" data-page="profile" onclick="showPage('profile')">
+        <span class="nav-icon">👤</span>Profile
+      </button>
+    </nav>
+  </div>
+
+  <div class="modal-backdrop" id="modal">
+    <div class="modal">
+      <h3 id="modalTitle">BN Earning Hub</h3>
+      <p id="modalText"></p>
+      <button class="btn btn-primary full" onclick="closeModal()">OK</button>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+
+    // Your existing Monetag Direct Link / SmartLink.
+    const MONETAG_LINK = "https://omg10.com/4/11526446";
+
+    // Replace this with your real Telegram channel/group URL.
+    const COMMUNITY_LINK = "https://t.me/BNEarningHubBot";
+
+    const state = {
+      balance: Number(localStorage.getItem("bn_balance") || 0),
+      completed: Number(localStorage.getItem("bn_completed") || 0)
+    };
+
+    function money(value){
+      return "$" + Number(value).toFixed(2);
+    }
+
+    function saveState(){
+      localStorage.setItem("bn_balance", state.balance.toFixed(2));
+      localStorage.setItem("bn_completed", String(state.completed));
+    }
+
+    function render(){
+      document.getElementById("balance").textContent = money(state.balance);
+      document.getElementById("homeBalance").textContent = money(state.balance);
+      document.getElementById("completedCount").textContent = state.completed;
+    }
+
+    function showPage(page){
+      document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+      document.getElementById("page-" + page).classList.add("active");
+
+      document.querySelectorAll(".nav-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.page === page);
+      });
+
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    function openProfile(){
+      showPage("profile");
+    }
+
+    function openOffer(){
+      // Open the SmartLink in Telegram's webview/browser.
+      // Reward is NOT automatically credited here; real crediting requires server-side tracking.
+      if (tg && tg.openLink){
+        tg.openLink(MONETAG_LINK);
+      } else {
+        window.open(MONETAG_LINK, "_blank", "noopener");
+      }
+    }
+
+    function joinCommunity(){
+      if (tg && tg.openTelegramLink){
+        tg.openTelegramLink(COMMUNITY_LINK);
+      } else {
+        window.open(COMMUNITY_LINK, "_blank", "noopener");
+      }
+    }
+
+    function copyReferral(){
+      const link = document.getElementById("refLink").textContent;
+      navigator.clipboard?.writeText(link).then(() => {
+        showModal("Copied", "Your referral link has been copied.");
+      }).catch(() => {
+        showModal("Referral Link", link);
+      });
+    }
+
+    function showModal(title, text){
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalText").textContent = text;
+      document.getElementById("modal").classList.add("show");
+    }
+
+    function closeModal(){
+      document.getElementById("modal").classList.remove("show");
+    }
+
+    function closeMiniApp(){
+      if (tg) tg.close();
+    }
+
+    function setupTelegram(){
+      if (!tg) return;
+
+      tg.ready();
+      tg.expand();
+
+      // Match Telegram's theme where possible.
+      document.documentElement.style.setProperty("--bg", tg.themeParams?.bg_color || "#f4f7fb");
+
+      const user = tg.initDataUnsafe?.user;
+
+      if (user){
+        const first = user.first_name || "";
+        const last = user.last_name || "";
+        const fullName = (first + " " + last).trim() || "Telegram User";
+        const username = user.username ? "@" + user.username : "No username";
+
+        document.getElementById("userPill").textContent = fullName;
+        document.getElementById("profileName").textContent = fullName;
+        document.getElementById("profileUsername").textContent = username;
+        document.getElementById("profileId").textContent = String(user.id);
+        document.getElementById("profileLang").textContent = user.language_code || "unknown";
+
+        if (user.photo_url){
+          const avatar = document.getElementById("avatar");
+          avatar.innerHTML = '<img src="' + user.photo_url + '" alt="Profile">';
+        }
+
+        // Demo referral link. A production app should generate this from your backend.
+        document.getElementById("refLink").textContent =
+          "https://t.me/BNEarningHubBot?start=ref_" + user.id;
+      }
+    }
+
+    // Demo reward function intentionally NOT connected to the offer click.
+    // This prevents falsely presenting an ad click as a verified conversion.
+    function demoReward(){
+      state.balance += 0.05;
+      state.completed += 1;
+      saveState();
+      render();
+    }
+
+    setupTelegram();
+    render();
+  </script>
+</body>
+</html>
